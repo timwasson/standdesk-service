@@ -1,0 +1,32 @@
+.wrapper {
+  max-width: 960px;
+  margin: 0 auto; }
+
+.pure-alert {
+  position: relative;
+  margin-bottom: 1em;
+  padding: 1em;
+  background: #ccc;
+  border-radius: 3px; }
+
+.pure-alert label {
+  display: inline-block;
+  white-space: nowrap; }
+
+.pure-alert {
+  background-color: #d1ebee;
+  color: #668391; }
+
+.pure-alert-error {
+  background-color: #D13C38;
+  color: #fff; }
+
+.pure-alert-warning {
+  background-color: #fabf67;
+  color: #97600d; }
+
+.pure-alert-success {
+  background-color: #53b44f;
+  color: #fff; }
+
+/*# sourceMappingURL=style.css.map */

@@ -1,0 +1,75 @@
+html
+  head 
+    meta(name="viewport", content="width=device-width, initial-scale=1")
+    title!= title
+    link(rel="stylesheet", href="/css/style.css")
+    link(rel="stylesheet", href="http://yui.yahooapis.com/pure/0.6.0/pure-min.css")
+    script(src="https://code.jquery.com/jquery-2.1.4.js")
+    script(src="/js/js.js")
+  body
+    div.wrapper
+      h1= message
+      div.pure-g
+        div.pure-u-1
+          div.pure-alert.pure-alert-error
+            label="testing! "
+            =" Thisis only a test"
+      div.pure-g
+        div.pure-u-1-3
+          p="Thirds"
+        div.pure-u-2-3
+          form.pure-form
+            fieldset
+              legend="Sit and Stand settings"
+              div
+                label.pure-u-1-5(for="sitDuration")= "Sit Duration"
+                input(name="sitDuration" id="sitDuration" type="text" placeholder="Sit Duration" size="2" value=sitDuration) 
+                span=" Minutes"
+              div
+                label.pure-u-1-5(for="standDuration")= "Stand Duration"
+                input(name="standDuration" id="standDuration" type="text" placeholder="Stand Duration" size="2" value=standDuration)
+                span=" Minutes"
+            fieldset
+              legend="Active Days"
+              div
+                each val, index in {0:'Sunday',1:'Monday',2:'Tuesday',3:'Wedneday',4:'Thursday',5:'Friday',6:'Saturday'}
+                  label(for="option-one" class="pure-checkbox")
+                    input(type="checkbox" name="activeDays" value=index)
+                    = " " + val
+            fieldset
+              legend="Active Hours"
+              div
+                label(for="activeHourStart")= "Active Hours Start Time"
+                - var n = 1
+                select(name="activeHourStart", id="activeHourStart")
+                  while n < 24
+                    option(value=n)= n
+                    - n++
+                =":"
+                - var n = 0
+                select(name="activeMinuteStart", id="activeMinuteStart")
+                  while n < 60
+                    if n < 10
+                      option(value="0" + n)= "0" + n
+                    else 
+                      option(value=n)= n
+                    - n++
+                
+                div
+                label(for="activeHourStop")= "Active Hours Stop Time"
+                - var n = 1
+                select(name="activeHourStop", id="activeHourStop")
+                  while n < 24
+                    option(value=n)= n
+                    - n++
+                =":"
+                - var n = 0
+                select(name="activeMinuteStop", id="activeMinuteStop")
+                  while n < 60
+                    if n < 10
+                      option(value="0" + n)= "0" + n
+                    else 
+                      option(value=n)= n
+                    - n++
+              
+            button.pure-button.pure-button-primary(type="submit")="Sign in"
