@@ -7,7 +7,8 @@
     "body-parser": "^1.14.1",
     "express": "^4.13.3",
     "jade": "^1.11.0",
-    "pm2": "^0.15.10"
+    "pm2": "^0.15.10",
+    "r-pi-usonic": "^2.5.0"
   },
   "devDependencies": {},
   "scripts": {
