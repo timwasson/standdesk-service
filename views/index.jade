@@ -11,24 +11,30 @@ html
       h1= message
       div.pure-g
         div.pure-u-1
-          div.pure-alert.pure-alert-error
-            label="testing! "
-            =" Thisis only a test"
+          //div.pure-alert.pure-alert-error
+          //  label="testing! "
+          //  =" Thisis only a test"
       div.pure-g
         div.pure-u-1-3
-          button.button-xlarge.pure-button= "Up" 
-          button.button-xlarge.pure-button= "Down" 
+          button.button-up.pure-button#upPress= "▲ Up" 
+          button.button-down.pure-button#downPress= "Down ▼" 
+          div#timer
+            div#clock
+            div= "Remaining"
+          div#status= "Currently"
+            span
+          div#height
         div.pure-u-2-3
           form.pure-form
             fieldset
               legend="Sit and Stand settings"
               div
                 label.pure-u-1-5(for="sitDuration")= "Sit Duration"
-                input(name="sitDuration" id="sitDuration" type="text" placeholder="Sit Duration" size="2" value=sitDuration) 
+                input(name="sitDuration" id="sitDuration" type="text" placeholder="Sit Duration" size="3" value=sitDuration) 
                 span=" Minutes"
               div
                 label.pure-u-1-5(for="standDuration")= "Stand Duration"
-                input(name="standDuration" id="standDuration" type="text" placeholder="Stand Duration" size="2" value=standDuration)
+                input(name="standDuration" id="standDuration" type="text" placeholder="Stand Duration" size="3" value=standDuration)
                 span=" Minutes"
             fieldset
               legend="Active Days"
@@ -73,4 +79,4 @@ html
                       option(value=n)= n
                     - n++
               
-            button.pure-button.pure-button-primary(type="submit")="Sign in"
+            button.pure-button.pure-button-primary#save(type="submit")="Update Settings"

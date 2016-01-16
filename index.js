@@ -12,11 +12,8 @@ var distance, sitStand, timer;
 // Get desk config
 var appConfig = JSON.parse(fs.readFileSync('config.json', 'utf8'));
 
-//var standDuration = parseInt(appConfig.standDuration);
-//var sitDuration = parseInt(appConfig.sitDuration);
-
-var standDuration = 120;
-var sitDuration = 100;
+var standDuration = parseInt(appConfig.standDuration);
+var sitDuration = parseInt(appConfig.sitDuration);
 
 // Initialize the distance sensor
 usonic.init(function (error) {
@@ -29,11 +26,9 @@ usonic.init(function (error) {
       distance = sensor();
     }, 500);
     if(distance < 72) {
-      sitStand = 'sit';
-      timer = sitDuration;
+      timer = sitDuration * 60;
     } else {
-      sitStand = 'stand';
-      timer = standDuration;
+      timer = standDuration * 60;
     }
   }
 });
@@ -60,39 +55,85 @@ var down = gpio.export(4, {
    direction: 'out',
    interval: 200
 });
-// End pin export
 
+// Hardware button presses
+var buttonPower = gpio.export(4, {
+   direction: 'out',
+   interval: 200
+});
+var upButtonPress = gpio.export(22, {
+   direction: 'in',
+   interval: 200
+});
+var downButtonPress = gpio.export(17, {
+   direction: 'in',
+   interval: 200
+});
+// End pin export
 setInterval(function(){
   // Ensure sitting/standing is set properly by checking distance
   if(distance < 72) {
     sitStand = 'sit';
-  } else {
+  } else if (distance > 113) {
     sitStand = 'stand';
+  } else {
+    sitStand = 'moving';
   }
   // Only run this on certain days and certain times
   var today = new Date();
+  console.log(today.getDay() + " | " + today.getHours());
   // Don't run on the weekends (6 and 0) or before/after certain hours (8 and 5)
-  //if(today.getDay() !=6 && today.getDay() != 0 && today.getHours() >= 8 && today.getHours() <= 17) {
+  if(today.getDay() !=6 && today.getDay() != 0 && today.getHours() >= 8 && today.getHours() <= 17) {
     timer--;
+    // Brute force
+    if (timer <= 0) { timer = 0; }
     console.log("Time Remaining: " + timer + " | Distance: " + distance + " | Currently: " + sitStand);
     if(sitStand == 'stand' && timer == 0) {
-      down.set(1);
-      up.set(0);
+      downPress();
   
-      timer = sitDuration;
-      sitStand = 'sit';
+      timer = sitDuration * 60;
     } else if(sitStand == 'sit' && timer == 0) {
-      down.set(0);
-      up.set(1);
+      upPress();
       
-      timer = standDuration;
-      sitStand = 'stand';
+      timer = standDuration * 60;
     }
-  //}
+  }
 }, 
-// 1 minute
+// 1 second
 1000
 );
+
+function downPress() {
+  down.set(1);
+  up.set(0);
+  sitStand = 'moving';
+  setTimeout(function() {
+    down.set(0);
+  }, 500);
+}
+
+function upPress() {
+  down.set(0);
+  up.set(1);
+  sitStand = 'moving';
+  setTimeout(function() {
+    up.set(0);
+  }, 500);
+}
+
+downButtonPress.on("change", function() {
+  if(downButtonPress.value == 1) {
+    console.log('Down button pressed');
+    downPress();
+  }
+});
+
+upButtonPress.on("change", function() {
+  if(upButtonPress.value == 1) {
+    console.log('Up button pressed');
+    upPress();
+  }
+})
 
 app.get('/', function (req, res) {
   res.render('index', { 
@@ -109,9 +150,7 @@ app.get('/up', function (req, res) {
   var jsonString = JSON.stringify(foo);
   res.send(jsonString);
   
-  // Set GPIO to stand
-  down.set(0);
-  up.set(1);
+  upPress();
 });
 
 app.get('/down', function (req, res) {
@@ -120,9 +159,7 @@ app.get('/down', function (req, res) {
   var jsonString = JSON.stringify(foo);
   res.send(jsonString);
   
-  // Set GPIO to sit
-  down.set(1);
-  up.set(0);
+  downPress();
 });
 
 app.get('/status', function (req, res) {

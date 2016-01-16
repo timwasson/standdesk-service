@@ -28,11 +28,24 @@ $.fn.serializeObject = function() {
   });
   return o;
 }
+var SecondsTohhmmss = function(totalSeconds) {
+  var hours   = Math.floor(totalSeconds / 3600);
+  var minutes = Math.floor((totalSeconds - (hours * 3600)) / 60);
+  var seconds = totalSeconds - (hours * 3600) - (minutes * 60);
+
+  // round seconds
+  seconds = Math.round(seconds * 100) / 100
+
+  var result = (hours < 10 ? "0" + hours : hours);
+    result += ":" + (minutes < 10 ? "0" + minutes : minutes);
+    result += ":" + (seconds  < 10 ? "0" + seconds : seconds);
+  return result;
+}
 
 $( document ).ready(function() {
   // Handler for .ready() called.
   console.log("Ready!");
-  $("button").on("click", function(e) {
+  $("button#save").on("click", function(e) {
     e.preventDefault();
     console.log($("form").serialize());
     
@@ -50,4 +63,21 @@ $( document ).ready(function() {
       console.log( msg );
     });
   });
+  $("button#upPress").on("click", function() {
+    $.ajax("http://10.0.1.47:3000/up");
+  });
+  $("button#downPress").on("click", function() {
+    $.ajax("http://10.0.1.47:3000/down");
+  });
+  setInterval(function() {
+    $.getJSON("status", function(data){
+      var timeRem = data.timeRemain;
+      timeRem = SecondsTohhmmss(timeRem);
+      $("#status span").html(data.status);
+      $("#clock").html(timeRem);
+      $("#height").html(Math.round(data.distance) + " cm");
+      console.log(data);
+    })
+  }
+  , 1000);
 });
