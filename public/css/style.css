@@ -29,4 +29,26 @@
   background-color: #53b44f;
   color: #fff; }
 
+#upPress {
+  background: linear-gradient(to bottom, #627d4d 0%, #1f3b08 100%); }
+
+#downPress {
+  background: linear-gradient(to bottom, #a90329 0%, #6d0019 100%); }
+
+#upPress, #downPress {
+  color: #fff;
+  display: block;
+  margin: 0 auto;
+  width: 90%;
+  height: 70px;
+  text-shadow: 1px 1px 6px black;
+  text-transform: uppercase;
+  font-size: 15px; }
+
+#clock {
+  font-size: 60px;
+  padding: 0;
+  color: #000;
+  text-align: center; }
+
 /*# sourceMappingURL=style.css.map */
