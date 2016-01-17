@@ -1,1 +1,1 @@
-{"sitDuration":"45","standDuration":"20","activeHourStart":"1","activeMinuteStart":"00","activeHourStop":"1","activeMinuteStop":"00"}
+{"sitDuration":"45","standDuration":"25","activeDays[]":["1","2","3","4","5"],"activeHourStart":"8","activeMinuteStart":"00","activeHourStop":"16","activeMinuteStop":"45"}

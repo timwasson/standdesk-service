@@ -41,7 +41,10 @@ html
               div
                 each val, index in {0:'Sunday',1:'Monday',2:'Tuesday',3:'Wedneday',4:'Thursday',5:'Friday',6:'Saturday'}
                   label(for="option-one" class="pure-checkbox")
-                    input(type="checkbox" name="activeDays" value=index)
+                    if activeDays.indexOf(index) != -1
+                      input(type="checkbox" name="activeDays" value=index checked="checked")
+                    else
+                      input(type="checkbox" name="activeDays" value=index)
                     = " " + val
             fieldset
               legend="Active Hours"
@@ -50,16 +53,25 @@ html
                 - var n = 1
                 select(name="activeHourStart", id="activeHourStart")
                   while n < 24
-                    option(value=n)= n
+                    if activeHourStart == n
+                      option(value=n selected="selected")= n
+                    else
+                      option(value=n)= n
                     - n++
                 =":"
                 - var n = 0
                 select(name="activeMinuteStart", id="activeMinuteStart")
                   while n < 60
                     if n < 10
-                      option(value="0" + n)= "0" + n
-                    else 
-                      option(value=n)= n
+                      if activeMinuteStart == "0" + n
+                        option(value="0" + n selected="selected")= "0" + n
+                      else
+                        option(value="0" + n)= "0" + n
+                    else
+                      if activeMinuteStart == n
+                        option(value=n selected="selected")= n
+                      else
+                        option(value=n)= n
                     - n++
                 
                 div
@@ -67,16 +79,25 @@ html
                 - var n = 1
                 select(name="activeHourStop", id="activeHourStop")
                   while n < 24
-                    option(value=n)= n
+                    if activeHourStop == n
+                      option(value=n selected="selected")= n
+                    else
+                      option(value=n)= n
                     - n++
                 =":"
                 - var n = 0
                 select(name="activeMinuteStop", id="activeMinuteStop")
                   while n < 60
                     if n < 10
-                      option(value="0" + n)= "0" + n
-                    else 
-                      option(value=n)= n
+                      if activeMinuteStop == "0" + n
+                        option(value="0" + n selected="selected")= "0" + n
+                      else
+                        option(value="0" + n)= "0" + n
+                    else
+                      if activeMinuteStop == n
+                        option(value=n selected="selected")= n
+                      else
+                        option(value=n)= n
                     - n++
               
             button.pure-button.pure-button-primary#save(type="submit")="Update Settings"

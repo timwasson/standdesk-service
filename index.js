@@ -6,14 +6,27 @@ var path = require('path');
 var fs = require('fs');
 var bodyParser = require('body-parser');
 
-// Establish variables for desk distance, status and timer
-var distance, sitStand, timer;
+// Establish variables for desk distance, status, configuration, and timer
+var distance, sitStand, timer, appConfig, standDuration, sitDuration, activeHourStart, activeMinuteStart, activeHourStop, activeMinuteStop;
+var activeDays = [];
 
 // Get desk config
-var appConfig = JSON.parse(fs.readFileSync('config.json', 'utf8'));
+function getConfig() {
+  appConfig = JSON.parse(fs.readFileSync('config.json', 'utf8'));
+  standDuration = parseInt(appConfig.standDuration);
+  sitDuration = parseInt(appConfig.sitDuration);
+  activeHourStart = parseInt(appConfig.activeHourStart);
+  activeMinuteStart = parseInt(appConfig.activeMinuteStart);
+  activeHourStop = parseInt(appConfig.activeHourStop);
+  activeMinuteStop = parseInt(appConfig.activeMinuteStop);
+  
+  //Darn special characters
+  activeDays = JSON.stringify(appConfig["activeDays[]"]);
+  
+  console.log("grabbed configuration | " + standDuration + " | " + sitDuration + " | " + activeDays);
+}
 
-var standDuration = parseInt(appConfig.standDuration);
-var sitDuration = parseInt(appConfig.sitDuration);
+getConfig();
 
 // Initialize the distance sensor
 usonic.init(function (error) {
@@ -81,9 +94,9 @@ setInterval(function(){
   }
   // Only run this on certain days and certain times
   var today = new Date();
-  console.log(today.getDay() + " | " + today.getHours());
+  //console.log(today.getDay() + " | " + today.getHours() + " | " + activeDays.indexOf(today.getDay()) + " | " + typeof activeDays);
   // Don't run on the weekends (6 and 0) or before/after certain hours (8 and 5)
-  if(today.getDay() !=6 && today.getDay() != 0 && today.getHours() >= 8 && today.getHours() <= 17) {
+  if(activeDays.indexOf(today.getDay()) != -1 && today.getHours() >= activeHourStart && today.getMinutes() >= activeMinuteStart && today.getHours() <= activeHourStop && today.getMinutes() <= activeMinuteStop) {
     timer--;
     // Brute force
     if (timer <= 0) { timer = 0; }
@@ -109,7 +122,7 @@ function downPress() {
   sitStand = 'moving';
   setTimeout(function() {
     down.set(0);
-  }, 500);
+  }, 1000);
 }
 
 function upPress() {
@@ -118,19 +131,17 @@ function upPress() {
   sitStand = 'moving';
   setTimeout(function() {
     up.set(0);
-  }, 500);
+  }, 1000);
 }
 
 downButtonPress.on("change", function() {
   if(downButtonPress.value == 1) {
-    console.log('Down button pressed');
     downPress();
   }
 });
 
 upButtonPress.on("change", function() {
   if(upButtonPress.value == 1) {
-    console.log('Up button pressed');
     upPress();
   }
 })
@@ -140,7 +151,12 @@ app.get('/', function (req, res) {
     title: 'StandDesk Manager', 
     message: 'StandDesk Settings',
     sitDuration: sitDuration,
-    standDuration: standDuration
+    standDuration: standDuration,
+    activeDays: activeDays,
+    activeHourStart: activeHourStart,
+    activeMinuteStart: activeMinuteStart,
+    activeHourStop: activeHourStop,
+    activeMinuteStop: activeMinuteStop
   });
 });
 
@@ -174,8 +190,10 @@ app.post('/save',function(req,res){
   fs.writeFile("config.json", JSON.stringify(req.body), function(err) {
     if(err) {
       return console.log(err);
+    } else {
+      getConfig();
+      console.log("The file was saved!");
     }
-    console.log("The file was saved!");
   });
   res.end("yes");
 });
