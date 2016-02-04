@@ -5,9 +5,10 @@ var gpio = require('gpio');
 var path = require('path');
 var fs = require('fs');
 var bodyParser = require('body-parser');
+var Lcd = require('lcd');
 
 // Establish variables for desk distance, status, configuration, and timer
-var distance, sitStand, timer, appConfig, standDuration, sitDuration, activeHourStart, activeMinuteStart, activeHourStop, activeMinuteStop;
+var distance, sitStand, timer, appConfig, standDuration, sitDuration, activeHourStart, activeMinuteStart, activeHourStop, activeMinuteStop, startTime, stopTime;
 var activeDays = [];
 
 // Get desk config
@@ -20,6 +21,9 @@ function getConfig() {
   activeHourStop = parseInt(appConfig.activeHourStop);
   activeMinuteStop = parseInt(appConfig.activeMinuteStop);
   
+  startTime = parseInt(activeHourStart + "" + activeMinuteStart);
+  stopTime = parseInt(activeHourStop + "" + activeMinuteStop);
+  
   //Darn special characters
   activeDays = JSON.stringify(appConfig["activeDays[]"]);
   
@@ -27,6 +31,20 @@ function getConfig() {
 }
 
 getConfig();
+
+var SecondsTohhmmss = function(totalSeconds) {
+  var hours   = Math.floor(totalSeconds / 3600);
+  var minutes = Math.floor((totalSeconds - (hours * 3600)) / 60);
+  var seconds = totalSeconds - (hours * 3600) - (minutes * 60);
+
+  // round seconds
+  seconds = Math.round(seconds * 100) / 100
+
+  var result = (hours < 10 ? "0" + hours : hours);
+      result += ":" + (minutes < 10 ? "0" + minutes : minutes);
+      result += ":" + (seconds  < 10 ? "0" + seconds : seconds);
+  return result;
+}
 
 // Initialize the distance sensor
 usonic.init(function (error) {
@@ -45,6 +63,30 @@ usonic.init(function (error) {
     }
   }
 });
+
+// Initialize the LCD
+var lcd = new Lcd({
+  rs: 19,
+  e: 26,
+  data: [13, 6, 5, 20],
+  cols: 8,
+  rows: 2
+});
+
+// Function for outputting month 
+var month = new Array();
+month[0] = "January";
+month[1] = "February";
+month[2] = "March";
+month[3] = "April";
+month[4] = "May";
+month[5] = "June";
+month[6] = "July";
+month[7] = "August";
+month[8] = "September";
+month[9] = "October";
+month[10] = "November";
+month[11] = "December";
 
 // Set up jade templating engine
 app.set('view engine', 'jade');
@@ -70,10 +112,6 @@ var down = gpio.export(4, {
 });
 
 // Hardware button presses
-var buttonPower = gpio.export(4, {
-   direction: 'out',
-   interval: 200
-});
 var upButtonPress = gpio.export(22, {
    direction: 'in',
    interval: 200
@@ -94,17 +132,29 @@ setInterval(function(){
   }
   // Only run this on certain days and certain times
   var today = new Date();
-  //console.log(today.getDay() + " | " + today.getHours() + " | " + activeDays.indexOf(today.getDay()) + " | " + typeof activeDays);
-  // Don't run on the weekends (6 and 0) or before/after certain hours (8 and 5)
-  if(activeDays.indexOf(today.getDay()) != -1 && today.getHours() >= activeHourStart && today.getMinutes() >= activeMinuteStart && today.getHours() <= activeHourStop && today.getMinutes() <= activeMinuteStop) {
+  var rightNow = parseInt(today.getHours() + "" + today.getMinutes());
+
+  console.log(today.getDay() + " | " + today.getHours() + " | " + activeDays.indexOf(today.getDay()) + " | " + startTime + " | " + stopTime + " | " + rightNow);
+  
+  lcd.setCursor(0, 0);
+  lcd.print(SecondsTohhmmss(timer) + "   " + Math.round(distance) + "cm");
+  
+  lcd.once('printed', function() {
+    lcd.setCursor(0, 1);
+    lcd.print(month[today.getMonth()] + " " + today.getDay());
+  });
+    
+  if(activeDays.indexOf(today.getDay()) != -1 && rightNow >= startTime && rightNow <= stopTime) {
     timer--;
     // Brute force
     if (timer <= 0) { timer = 0; }
-    console.log("Time Remaining: " + timer + " | Distance: " + distance + " | Currently: " + sitStand);
+    console.log("Time Remaining: " + SecondsTohhmmss(timer) + " | Distance: " + distance + " | Currently: " + sitStand);
+    
     if(sitStand == 'stand' && timer == 0) {
       downPress();
   
       timer = sitDuration * 60;
+    
     } else if(sitStand == 'sit' && timer == 0) {
       upPress();
       
@@ -123,6 +173,14 @@ function downPress() {
   setTimeout(function() {
     down.set(0);
   }, 1000);
+  
+  lcd.setCursor(15, 1);
+  lcd.print("-");
+  
+  setTimeout(function() {
+    lcd.setCursor(15, 1);
+    lcd.print(" "); 
+  }, 5000);
 }
 
 function upPress() {
@@ -132,6 +190,14 @@ function upPress() {
   setTimeout(function() {
     up.set(0);
   }, 1000);
+  
+  lcd.setCursor(15, 1);
+  lcd.print("+");
+  
+  setTimeout(function() {
+    lcd.setCursor(15, 1);
+    lcd.print(" "); 
+  }, 5000);
 }
 
 downButtonPress.on("change", function() {
