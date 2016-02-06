@@ -174,12 +174,11 @@ function downPress() {
     down.set(0);
   }, 1000);
   
-  lcd.setCursor(15, 1);
-  lcd.print("-");
+  //lcd.setCursor(15, 1);
+  //lcd.print("-");
   
   setTimeout(function() {
-    lcd.setCursor(15, 1);
-    lcd.print(" "); 
+    //lcd.clear(); 
   }, 5000);
 }
 
@@ -191,12 +190,11 @@ function upPress() {
     up.set(0);
   }, 1000);
   
-  lcd.setCursor(15, 1);
-  lcd.print("+");
+  //lcd.setCursor(15, 1);
+  //lcd.print("+");
   
   setTimeout(function() {
-    lcd.setCursor(15, 1);
-    lcd.print(" "); 
+    //lcd.clear();
   }, 5000);
 }
 
