@@ -9,6 +9,7 @@ var bodyParser = require('body-parser');
 // Establish variables for desk distance, status, configuration, and timer
 var distance, sitStand, timer, appConfig, standDuration, sitDuration, activeHourStart, activeMinuteStart, activeHourStop, activeMinuteStop, startTime, stopTime;
 var activeDays = [];
+var pausedVal = false;
 
 // Get desk config
 function getConfig() {
@@ -126,11 +127,11 @@ setInterval(function(){
 
   console.log(today.getDay() + " | " + today.getHours() + " | " + activeDays.indexOf(today.getDay()) + " | " + startTime + " | " + stopTime + " | " + rightNow);
       
-  if(activeDays.indexOf(today.getDay()) != -1 && rightNow >= startTime && rightNow <= stopTime) {
+  if(activeDays.indexOf(today.getDay()) != -1 && rightNow >= startTime && rightNow <= stopTime && pausedVal == false) {
     timer--;
     // Brute force
     if (timer <= 0) { timer = 0; }
-    console.log("Time Remaining: " + SecondsTohhmmss(timer) + " | Distance: " + distance + " | Currently: " + sitStand);
+    console.log("Time Remaining: " + SecondsTohhmmss(timer) + " | Distance: " + distance + " | Currently: " + sitStand + " | Paused: " + pausedVal);
     
     if(sitStand == 'stand' && timer == 0) {
       downPress();
@@ -210,8 +211,28 @@ app.get('/down', function (req, res) {
   downPress();
 });
 
+app.get('/pause', function (req, res) {
+  // Send back JSON
+  var foo = {paused:'yes'};
+  var jsonString = JSON.stringify(foo);
+  
+  pausedVal = true;
+
+  res.send(jsonString);
+});
+
+app.get('/unpause', function (req, res) {
+  // Send back JSON
+  var foo = {paused:'no'};
+  var jsonString = JSON.stringify(foo);
+  
+  pausedVal = false;
+
+  res.send(jsonString);
+});
+
 app.get('/status', function (req, res) {
-  var foo = {status:sitStand, timeRemain:timer,distance:distance};
+  var foo = {status:sitStand, timeRemain:timer,distance:distance,paused:pausedVal};
   var jsonString = JSON.stringify(foo);
   res.send(jsonString);
 });
