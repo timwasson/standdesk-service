@@ -5,7 +5,6 @@ var gpio = require('gpio');
 var path = require('path');
 var fs = require('fs');
 var bodyParser = require('body-parser');
-var Lcd = require('lcd');
 
 // Establish variables for desk distance, status, configuration, and timer
 var distance, sitStand, timer, appConfig, standDuration, sitDuration, activeHourStart, activeMinuteStart, activeHourStop, activeMinuteStop, startTime, stopTime;
@@ -62,15 +61,6 @@ usonic.init(function (error) {
       timer = standDuration * 60;
     }
   }
-});
-
-// Initialize the LCD
-var lcd = new Lcd({
-  rs: 19,
-  e: 26,
-  data: [13, 6, 5, 20],
-  cols: 8,
-  rows: 2
 });
 
 // Function for outputting month 
@@ -135,15 +125,7 @@ setInterval(function(){
   var rightNow = parseInt(today.getHours() + "" + today.getMinutes());
 
   console.log(today.getDay() + " | " + today.getHours() + " | " + activeDays.indexOf(today.getDay()) + " | " + startTime + " | " + stopTime + " | " + rightNow);
-  
-  lcd.setCursor(0, 0);
-  lcd.print(SecondsTohhmmss(timer) + "   " + Math.round(distance) + "cm");
-  
-  lcd.once('printed', function() {
-    lcd.setCursor(0, 1);
-    lcd.print(month[today.getMonth()] + " " + today.getDay());
-  });
-    
+      
   if(activeDays.indexOf(today.getDay()) != -1 && rightNow >= startTime && rightNow <= stopTime) {
     timer--;
     // Brute force
@@ -173,13 +155,6 @@ function downPress() {
   setTimeout(function() {
     down.set(0);
   }, 1000);
-  
-  //lcd.setCursor(15, 1);
-  //lcd.print("-");
-  
-  setTimeout(function() {
-    //lcd.clear(); 
-  }, 5000);
 }
 
 function upPress() {
@@ -189,13 +164,6 @@ function upPress() {
   setTimeout(function() {
     up.set(0);
   }, 1000);
-  
-  //lcd.setCursor(15, 1);
-  //lcd.print("+");
-  
-  setTimeout(function() {
-    //lcd.clear();
-  }, 5000);
 }
 
 downButtonPress.on("change", function() {
