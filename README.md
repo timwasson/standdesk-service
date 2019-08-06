@@ -25,21 +25,26 @@ sudo apt-get dist-upgrade
 curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
 sudo apt-get install -y nodejs
 ```
+### 2) Install WiringPi
 
-### 2) Install NPM
+```
+sudo apt-get install wiringpi
+```
+
+### 3) Install NPM
 ```
 sudo apt-get update
 sudo apt-get install npm
 ```
-### 3) Confirm NPM version. This should show 5.8.0
+### 4) Confirm NPM version. This should show 5.8.0
 ```
 npm -v
 ```
-### 4) Confirm Node version. This should show 8.16.0
+### 5) Confirm Node version. This should show 8.16.0
 ```
 sudo node -v
 ```
-### 5) Git the project
+### 6) Git the project
 ```
 git clone https://github.com/ukypayne/standdesk-service.git
 ```
@@ -103,13 +108,13 @@ sudo nano standdesk.service
 Description=Standdesk Service
 
 [Service]
-ExecStart=/usr/bin/sudo /usr/local/bin/node /home/pi/Desktop/standdesk-service-$
+ExecStart=/usr/bin/sudo /usr/local/bin/node /home/pi/standdesk-service/
 Restart=always
 User=root
 # Note Debian/Ubuntu uses 'nogroup', RHEL/Fedora uses 'nobody'
 Environment=PATH=/usr/bin:/usr/local/bin
 Environment=NODE_ENV=production
-WorkingDirectory=/home/pi/Desktop/standdesk-service/
+WorkingDirectory=/home/pi/standdesk-service/
 
 [Install]
 WantedBy=multi-user.target
@@ -134,8 +139,8 @@ standdesk.service - Standdesk
  Main PID: 4355 (sudo)
     Tasks: 11 (limit: 4915)
    CGroup: /system.slice/standdesk.service
-           tq4355 /usr/bin/sudo /usr/local/bin/node /home/pi/Desktop/standdesk-s
-           mq4363 /usr/local/bin/node /home/pi/Desktop/standdesk-service-master/
+           tq4355 /usr/bin/sudo /usr/local/bin/node /home/pi/standdesk-s
+           mq4363 /usr/local/bin/node /home/pi/standdesk-service-master/
 
 Aug 05 16:04:12 Bi-Pi sudo[4355]: 1 | 16 | 2 | 755 | 1652 | 1604
 Aug 05 16:04:12 Bi-Pi sudo[4355]: Time Remaining: 00:34:53 | Distance: 72.9945 |
