@@ -185,7 +185,17 @@ There are a number of hard coded values in the index.js file. Most things are de
 "title: 'Billy\'s StandDesk Manager', 
 message: 'Billy\'s StandDesk Settings'
 ```
-
+* Currently, the buttons that load on the IP:3000 webpage have a direct reference to an IP hard coded. You will need to change these to correlate to your IP. Go to the */public/js/* directory and edit *js.js* and edit all references to 10.164.116.27
+```
+ $("button#upPress").on("click", function() {
+    $.ajax("http://10.164.116.27:3000/up");  });
+  $("button#downPress").on("click", function() {
+    $.ajax("http://10.164.116.27:3000/down");
+  $("button#Pause").on("click", function() {
+    $.ajax("http://10.164.116.27:3000/pause");  });
+  $("button#unPause").on("click", function() {
+    $.ajax("http://10.164.116.27:3000/unpause");  });
+```
 # Hardware Install
 Hardware includes a RPi 2, a 2 channel Relay board, and a HC-SR04 Ultrasonic Sensor module, and a 1k ohm resistor. I also added a perfboard to make the setup more contained. The Relay board simulates an up and a down button press that connects directly to my standing desk. My desk is made by Steelcase (don't have the exact model) and includes the motor and control circuit with a spare switch connector. I terminated a CAT6 cable into the spare jack and found which wires I needed to simulate the button being pressed for Up & Down.
 
