@@ -184,6 +184,8 @@ message: 'Billy\'s StandDesk Settings'
 # Hardware Install
 Hardware includes a RPi 2, a 2 channel Relay board, and a HC-SR04 Ultrasonic Sensor module, and a 1k ohm resistor. I also added a perfboard to make the setup more contained. The Relay board simulates an up and a down button press that connects directly to my standing desk. My desk is made by Steelcase (don't have the exact model) and includes the motor and control circuit with a spare switch connector. I terminated a CAT6 cable into the spare jack and found which wires I needed to simulate the button being pressed for Up & Down.
 
+*The RJ45 jack on the side represents the connector that my desk uses to connect to the control module. Pin 1 is the ground for my setup, and pins 4 & 5 are the up/down.*
+
 ![Image of Circuit](/images/Standdesk_bb.png)
 
 
