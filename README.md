@@ -204,3 +204,8 @@ Hardware includes a RPi 2, a 2 channel Relay board, and a HC-SR04 Ultrasonic Sen
 ![Image of Circuit](/images/Standdesk_bb.png)
 
 
+# To Do
+
+- [ ] Configure program to move to a pre-defined height rather than simulate button push for x number of seconds. (IE, Stand is alway 112 cm, Sit is always 70 cm)
+- [ ] Determine why config hours don't pull proper number of digits. IE, 8:00 am pulls as 80 instead of 800. Work around is used 7:59 or edit config file manually.
+- [ ] Flip relay status from high to low. This would allow the project to not be started, and the relays not "block" the OEM desk switch from operating.
