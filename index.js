@@ -1,5 +1,5 @@
 var express = require('express');
-var usonic = require('r-pi-usonic');
+var usonic = require('mmm-usonic-fixed');
 var app = express();
 var gpio = require('gpio');
 var path = require('path');
@@ -42,21 +42,28 @@ var SecondsTohhmmss = function(totalSeconds) {
 
   var result = (hours < 10 ? "0" + hours : hours);
       result += ":" + (minutes < 10 ? "0" + minutes : minutes);
-      result += ":" + (seconds  < 10 ? "0" + seconds : seconds);
+      result += ":" + (seconds < 10 ? "0" + seconds : seconds);
   return result;
 }
 
+
+
 // Initialize the distance sensor
+// createSensor (#A, #B, xxxx) 
+// A = Echo Pin
+// B = Trigger Pin
+// xxxx = Measurement Timeout
+
 usonic.init(function (error) {
   if (error) {
     console.log(error);
   } else {
-    var sensor = usonic.createSensor(23, 27, 1000);
+    var sensor = usonic.createSensor(21, 20, 1000);
     distance = sensor();
     setInterval(function() {
-      distance = sensor();
+	distance = sensor();
     }, 500);
-    if(distance < 72) {
+    if(distance < 80) {
       timer = sitDuration * 60;
     } else {
       timer = standDuration * 60;
@@ -88,21 +95,31 @@ app.use(express.static(__dirname + '/public'));
 app.use(bodyParser.urlencoded({ extended: false }));
 
 // Exporting GPIO pins
-var power = gpio.export(2, {
-   direction: 'in',
-   interval: 200
-});
-var up = gpio.export(3, {
-   direction: 'out',
-   interval: 200
-});
+//var power may not be needed - no connection
 
-var down = gpio.export(4, {
+// var power = gpio.export(2, {
+//   direction: 'in',
+//   interval: 200
+// });
+var up = gpio.export(6, {
+    direction: 'out',
+    interval: 200,
+    ready: function(){
+}
+});
+var down = gpio.export(5, {
    direction: 'out',
-   interval: 200
+   interval: 200,
+   ready: function(){
+}
 });
 
 // Hardware button presses
+// Unsure of use. Possibly for other button control inputs through Pi
+// Still exports at this point, so this possibly should also include distance sensor pins.
+// Pins are GPIO# pins, not board pin count. IE pin 4 is GPIO 4 which is physical 7
+// Unsure - but believed to be incomming signals of button presses, IE from the actual desk switch, to send info through pi to relays instead of directly to controller.
+
 var upButtonPress = gpio.export(22, {
    direction: 'in',
    interval: 200
@@ -113,17 +130,20 @@ var downButtonPress = gpio.export(17, {
 });
 // End pin export
 setInterval(function(){
-  // Ensure sitting/standing is set properly by checking distance
-  if(distance < 72) {
+
+// Ensure sitting/standing is set properly by checking distance
+  if(distance < 78) {
     sitStand = 'sit';
-  } else if (distance > 113) {
+  } else if (distance > 88) {
     sitStand = 'stand';
   } else {
     sitStand = 'moving';
   }
-  // Only run this on certain days and certain times
+// Only run this on certain days and certain times
   var today = new Date();
-  var rightNow = parseInt(today.getHours() + "" + today.getMinutes());
+  var minutesPrefix = today.getMinutes() < 10 ? '0' : '';
+  var rightNow = parseInt(today.getHours() + minutesPrefix + today.getMinutes())
+
 
   console.log(today.getDay() + " | " + today.getHours() + " | " + activeDays.indexOf(today.getDay()) + " | " + startTime + " | " + stopTime + " | " + rightNow);
       
@@ -149,13 +169,20 @@ setInterval(function(){
 1000
 );
 
+
+
+
+// downPress and upPress listed below triggers the up and down relays to be triggered.
+//The timeout number listed below is the movement time, to simulate the button being pressed.
+
+
 function downPress() {
   down.set(1);
   up.set(0);
   sitStand = 'moving';
   setTimeout(function() {
     down.set(0);
-  }, 1000);
+  }, 6900);
 }
 
 function upPress() {
@@ -164,8 +191,9 @@ function upPress() {
   sitStand = 'moving';
   setTimeout(function() {
     up.set(0);
-  }, 1000);
+  }, 6900);
 }
+
 
 downButtonPress.on("change", function() {
   if(downButtonPress.value == 1) {
@@ -181,8 +209,8 @@ upButtonPress.on("change", function() {
 
 app.get('/', function (req, res) {
   res.render('index', { 
-    title: 'StandDesk Manager', 
-    message: 'StandDesk Settings',
+    title: 'Billy\'s StandDesk Manager', 
+    message: 'Billy\'s StandDesk Settings',
     sitDuration: sitDuration,
     standDuration: standDuration,
     activeDays: activeDays,

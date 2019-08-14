@@ -64,10 +64,13 @@ $( document ).ready(function() {
     });
   });
   $("button#upPress").on("click", function() {
-    $.ajax("http://10.0.1.47:3000/up");
-  });
+    $.ajax("http://10.164.116.27:3000/up");  });
   $("button#downPress").on("click", function() {
-    $.ajax("http://10.0.1.47:3000/down");
+    $.ajax("http://10.164.116.27:3000/down");
+  $("button#Pause").on("click", function() {
+    $.ajax("http://10.164.116.27:3000/pause");  });
+  $("button#unPause").on("click", function() {
+    $.ajax("http://10.164.116.27:3000/unpause");  });
   });
   setInterval(function() {
     $.getJSON("status", function(data){

@@ -6,10 +6,12 @@
   "dependencies": {
     "body-parser": "^1.14.1",
     "express": "^4.13.3",
+    "gpio": "^0.2.10",
     "jade": "^1.11.0",
     "lcd": "^1.1.1",
-    "pm2": "^0.15.10",
-    "r-pi-usonic": "^2.5.0"
+    "mmm-usonic": "^2.5.1",
+    "mmm-usonic-fixed": "^2.5.3",
+    "pm2": "^3.5.1"
   },
   "devDependencies": {},
   "scripts": {
