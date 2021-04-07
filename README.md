@@ -203,6 +203,19 @@ Hardware includes a RPi 2, a 2 channel Relay board, and a HC-SR04 Ultrasonic Sen
 
 ![Image of Circuit](/images/Standdesk_bb.png)
 
+# Windows Scheduler
+In order to automatically start and stop the desk when I am away, I used Windows task scheduler to run a command when I login and lock the machine to unpause/pause the timer.
+
+Open Task Scheduler and Create Task. Give it a name (This is for Pause). Under the "Triggers" tab, click NEW and then "Begin the task: On workstation lock. Click OK. Under the "Actions" tab, click NEW and then "Action: Start a program" and start "Powershell" with the arguments "Invoke-WebRequest -uri http://10.164.116.27:3000/pause" where the IP address is the IP of your pi.
+
+Now you can do the exact same thing for unpause, but I use Microsoft Remote Desktop rather often and don't want my desk moving when I'm not actually there, and that caused me a few issues. So instead of running the command "Invoke-WebRequest -uri http://10.164.116.27:3000/unpause", I made the argument "C:\StandDeskUnpause.ps1".
+
+You must then create a PS1 file that will have a very basic if statement. So copy past the code below and save it as a PS1 file (I put it in root C:. This command will run quser and check to see if the user is logged in as CONSOLE or RDP-TCP, and if it is CONSOLE, then it will pass along the unpause command. (Again, replace the IP with whatever yours is).
+```
+$Users = (quser) -ireplace '\s{2,}',',' | ConvertFrom-CSV ; If ($Users.SESSIONNAME -eq "console"){  Invoke-WebRequest -uri http://10.164.116.27:3000/unpause}
+```
+
+
 
 # To Do
 
